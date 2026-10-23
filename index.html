@@ -80,12 +80,11 @@ header.top .intro p { color: var(--muted); font-size: 16px; }
 
 /* Werkzaamheden */
 .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
-table { border-collapse: collapse; width: 100%; min-width: 420px; font-size: 14px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
 th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 thead th { font: 600 12px/1.2 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--paper); }
 tbody tr.group th { background: var(--paper); font-family: var(--font-display); font-stretch: 90%; font-size: 14px; color: var(--ink); padding-top: 18px; }
 tbody tr:last-child td { border-bottom: 0; }
-td.num, th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 td .note { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; max-width: 60ch; }
 .outside { margin-top: 16px; padding: 14px 18px; border: 1px dashed var(--line); border-radius: 6px; font-size: 14px; color: var(--muted); }
 .outside b { color: var(--ink); }
@@ -147,7 +146,6 @@ footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--lin
         <thead>
           <tr>
             <th>Werkzaamheid</th>
-            <th class="num">Hoeveelheid</th>
           </tr>
         </thead>
         <tbody id="work-body"></tbody>
@@ -166,9 +164,9 @@ const PLANS = /*PLANS*/[{"id":"origineel","title":"Huidige situatie","walls":[{"
 
 const WORK = [
   { group: "Beide opties", rows: [
-    { t: "Vloerisolatie", n: "De isolatie kan in de kruipruimte worden aangebracht.", q: "± 55 m²", o: [1, 2] },
-    { t: "Vloerverwarming", n: "Er komt een warmtepomp; de vloerverwarming moet daarmee kunnen werken.", q: "± 55 m²", o: [1, 2] },
-    { t: "Nieuwe vloer leggen", n: "Voorkeur voor parket; alternatief is PVC.", q: "± 55 m²", o: [1, 2] },
+    { t: "Vloerisolatie", n: "De isolatie kan in de kruipruimte worden aangebracht.", o: [1, 2] },
+    { t: "Vloerverwarming", n: "Er komt een warmtepomp; de vloerverwarming moet daarmee kunnen werken.", o: [1, 2] },
+    { t: "Nieuwe vloer leggen", n: "Voorkeur voor parket; alternatief is PVC.", o: [1, 2] },
     { t: "Muren stucen", n: "Alleen de benedenverdieping.", o: [1, 2] },
     { t: "Toilet terugplaatsen op de originele plek", n: "Aansluitingen terugleggen naar de originele plek, toilet plaatsen en tegelen.", o: [1, 2] },
     { t: "Leidingwerk keuken aanpassen", o: [1, 2] },
@@ -466,17 +464,15 @@ function renderWork() {
   const body = document.getElementById("work-body");
   WORK.forEach(g => {
     const tr = document.createElement("tr"); tr.className = "group";
-    const th = document.createElement("th"); th.colSpan = 2; th.textContent = g.group;
+    const th = document.createElement("th"); th.colSpan = 1; th.textContent = g.group;
     tr.appendChild(th); body.appendChild(tr);
     g.rows.forEach(r => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td><span class="t"></span><span class="note"></span></td>
-        <td class="num"></td>`;
+        <td><span class="t"></span><span class="note"></span></td>`;
       row.querySelector(".t").textContent = r.t;
       const note = row.querySelector(".note");
       if (r.n) note.textContent = r.n; else note.remove();
-      row.children[1].textContent = r.q || "";
       body.appendChild(row);
     });
   });
