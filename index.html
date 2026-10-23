@@ -179,13 +179,13 @@ const CHANGES = {
 
 const WORK = [
   { group: "Beide opties", rows: [
-    { t: "Vloerisolatie", q: "± 55 m²", o: [1, 2] },
-    { t: "Vloerverwarming", q: "± 55 m²", o: [1, 2] },
+    { t: "Vloerisolatie", n: "De isolatie kan in de kruipruimte worden aangebracht.", q: "± 55 m²", o: [1, 2] },
+    { t: "Vloerverwarming", n: "Er komt een warmtepomp; de vloerverwarming moet daarmee kunnen werken.", q: "± 55 m²", o: [1, 2] },
     { t: "Nieuwe vloer leggen", n: "Voorkeur voor parket; alternatief is PVC.", q: "± 55 m²", o: [1, 2] },
-    { t: "Muren stucen", o: [1, 2] },
-    { t: "Toilet verplaatsen", n: "Aansluitingen verleggen, toilet plaatsen en tegelen.", o: [1, 2] },
-    { t: "Muren entree aanpassen", n: "De hal wordt kleiner en het toilet verplaatst.", o: [1, 2] },
+    { t: "Muren stucen", n: "Alleen de benedenverdieping.", o: [1, 2] },
+    { t: "Toilet terugplaatsen op de originele plek", n: "Aansluitingen terugleggen naar de originele plek, toilet plaatsen en tegelen.", o: [1, 2] },
     { t: "Leidingwerk keuken aanpassen", o: [1, 2] },
+    { t: "Muren entree aanpassen", n: "De hal wordt kleiner.", o: [1, 2] },
     { t: "Nieuwe binnendeur entree plaatsen", o: [1, 2] },
     { t: "Opening maken in de muur tussen keuken en woonkamer",
       n: "We vermoeden dat dit een draagmuur is. Hoe groot de opening kan worden, hangt af van wat er mogelijk is.", o: [1, 2] },
@@ -360,7 +360,6 @@ function init3D() {
     low: new THREE.MeshLambertMaterial({ color: 0xfafaf8 }),
     cap: new THREE.MeshBasicMaterial({ color: 0x111111 }),
     glass: new THREE.MeshLambertMaterial({ color: 0xcfe3e6, transparent: true, opacity: 0.5 }),
-    item: new THREE.MeshLambertMaterial({ color: 0xb8bab9 }),
   };
 
   let group = null, variant = "optie1", fitted = false;
@@ -419,15 +418,6 @@ function init3D() {
         cur = Math.max(cur, o.e);
       });
       piece(cur, L + w.t / 2, 0, w.h, mat);
-    });
-
-    // Meubels als blokken
-    plan.items.forEach(i => {
-      if (i.zh > 250) return;
-      const m = box(i.w * S, i.zh * S, i.d * S, M.item);
-      m.position.set(i.x * S, (i.z + i.zh / 2) * S, i.y * S);
-      m.rotation.y = -i.rot * Math.PI / 180;
-      group.add(m);
     });
 
     scene.add(group);
