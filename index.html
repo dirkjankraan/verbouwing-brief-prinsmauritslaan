@@ -327,9 +327,9 @@ function init3D() {
   if (!window.THREE || !THREE.OrbitControls) { status.textContent = "3D-model kon niet laden."; return null; }
   status.remove();
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setClearColor(0xffffff);
+  renderer.setClearColor(0xefeeec);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   host.prepend(renderer.domElement);
@@ -341,28 +341,37 @@ function init3D() {
   controls.maxPolarAngle = Math.PI * 0.49;
   controls.minDistance = 3; controls.maxDistance = 40;
 
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xd5dadc, 0.85));
-  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-  const sun = new THREE.DirectionalLight(0xffffff, 0.5);
+  // Zacht licht: samen rond 1, zodat kleuren niet uitbleken
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xe8e6e2, 0.25));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.35);
   sun.position.set(-6, 14, -8);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10 });
   scene.add(sun);
 
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshStandardMaterial({ color: 0xe6e9e3, roughness: 1 }));
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshLambertMaterial({ color: 0xefeeec }));
   ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; ground.receiveShadow = true;
   scene.add(ground);
 
   const M = {
-    wall: new THREE.MeshStandardMaterial({ color: 0xf4f2ed, roughness: 0.9 }),
-    low: new THREE.MeshStandardMaterial({ color: 0xc9ced1, roughness: 0.9 }),
-    glass: new THREE.MeshStandardMaterial({ color: 0x9cc7d8, transparent: true, opacity: 0.35, roughness: 0.1 }),
-    item: new THREE.MeshStandardMaterial({ color: 0xc4c8c9, roughness: 0.8 }),
+    wall: new THREE.MeshLambertMaterial({ color: 0xfafaf8 }),
+    low: new THREE.MeshLambertMaterial({ color: 0xfafaf8 }),
+    cap: new THREE.MeshBasicMaterial({ color: 0x111111 }),
+    glass: new THREE.MeshLambertMaterial({ color: 0xcfe3e6, transparent: true, opacity: 0.5 }),
+    item: new THREE.MeshLambertMaterial({ color: 0xb8bab9 }),
   };
 
   let group = null, variant = "optie1", fitted = false;
   const S = 0.01; // cm → m
+
+  // Houten vloer in de leefruimtes, licht grijs in garage, hal en toilet
+  function floorColor(name) {
+    if (name === "Garage") return 0xdcdad6;
+    if (["Toilet", "MK", "Entree", "Hal + toilet", "Column"].includes(name)) return 0xe6e4e0;
+    return 0xdcc7a8;
+  }
 
   function box(len, h, t, mat) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(len, h, t), mat);
@@ -378,7 +387,7 @@ function init3D() {
     // Vloeren
     [...plan.areas].sort((a, b) => b.m2 - a.m2).forEach((a, i) => {
       const shape = new THREE.Shape(a.poly.map(p => new THREE.Vector2(p.x * S, -p.y * S)));
-      const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshStandardMaterial({ color: new THREE.Color(a.color), roughness: 0.95 }));
+      const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshLambertMaterial({ color: floorColor(a.name) }));
       mesh.rotation.x = -Math.PI / 2; mesh.position.y = 0.002 * (i + 1); mesh.receiveShadow = true;
       group.add(mesh);
     });
@@ -393,7 +402,9 @@ function init3D() {
       const piece = (s, e, y0, y1, m) => {
         y1 = Math.min(y1, w.h);
         if (e - s < 0.5 || y1 - y0 < 0.5) return;
-        const mesh = box((e - s) * S, (y1 - y0) * S, w.t * S, m);
+        // Bovenkant van de muur zwart, zoals in Floorplanner
+        const top = m !== M.glass && y1 >= w.h - 0.5;
+        const mesh = box((e - s) * S, (y1 - y0) * S, w.t * S, top ? [m, m, M.cap, m, m, m] : m);
         const c = (s + e) / 2;
         mesh.position.set((w.a.x + ux * c) * S, ((y0 + y1) / 2) * S, (w.a.y + uy * c) * S);
         mesh.rotation.y = ang;
@@ -423,7 +434,7 @@ function init3D() {
     if (!fitted) {
       const bb = new THREE.Box3().setFromObject(group), c = bb.getCenter(new THREE.Vector3());
       controls.target.set(c.x, 0.6, c.z);
-      camera.position.set(c.x + 7, 11, c.z + 13);
+      camera.position.set(c.x + 8, 13, c.z + 15);
       fitted = true;
     }
   }
