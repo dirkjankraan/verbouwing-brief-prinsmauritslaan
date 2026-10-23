@@ -1,0 +1,501 @@
+<meta charset="utf-8">
+<title>Verbouwing Prins Mauritslaan 8</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lichte werktekening-brief — kop met adres, drie varianten als kaarten met plattegrond, daaronder de werkzaamheden */
+:root {
+  --paper: #f3f4f1;
+  --surface: #ffffff;
+  --ink: #1b2124;
+  --muted: #5b666c;
+  --line: #dde1dc;
+  --accent: #1e6872;
+  --sheet-muted: #7a858b;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 15px/1.55 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 40px 64px; display: grid; gap: 56px; }
+.wrap > * { min-width: 0; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 4.6vw, 48px); font-weight: 750; font-stretch: 85%; letter-spacing: -0.01em; line-height: 1.05; }
+h2 { font-size: 24px; font-weight: 700; font-stretch: 90%; }
+h3 { font-size: 17px; font-weight: 650; }
+p { margin: 0; }
+.eyebrow { font: 600 12px/1.2 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Kop */
+header.top { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: end; }
+header.top .intro { display: grid; gap: 14px; max-width: 64ch; }
+header.top .intro p { color: var(--muted); font-size: 16px; }
+.funda {
+  display: grid; gap: 6px; padding: 18px 20px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 6px; text-decoration: none; color: var(--ink);
+}
+.funda:hover { border-color: var(--accent); }
+.funda .go { color: var(--accent); font-weight: 600; }
+.funda small { color: var(--muted); }
+
+/* Sectiekop */
+.section-head { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; margin-bottom: 16px; }
+.section-head .lead { display: grid; gap: 6px; }
+.section-head .lead p { color: var(--muted); max-width: 70ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); padding: 2px; }
+.seg button {
+  font: 500 13px/1 var(--font-body); color: var(--muted); background: none; border: 0;
+  padding: 8px 12px; border-radius: 4px; cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+
+/* Varianten: plattegrond + verschillen per kaart */
+.variants { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.variant { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: grid; gap: 14px; align-content: start; }
+.variant svg { width: 100%; height: auto; display: block; }
+.variant ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: var(--muted); font-size: 14px; }
+
+/* 3D */
+.viewer { position: relative; height: min(70vh, 640px); min-height: 380px; border-radius: 6px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
+.viewer canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.viewer .hint {
+  position: absolute; left: 12px; bottom: 12px; font-size: 12px; color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 85%, transparent); padding: 6px 10px; border-radius: 4px;
+}
+.viewer .status { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px; }
+
+/* Werkzaamheden */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { font: 600 12px/1.2 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--paper); }
+tbody tr.group th { background: var(--paper); font-family: var(--font-display); font-stretch: 90%; font-size: 14px; color: var(--ink); padding-top: 18px; }
+tbody tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.check, th.check { text-align: center; width: 80px; }
+td .note { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; max-width: 60ch; }
+.yes { color: var(--accent); font-weight: 700; }
+.no { color: var(--line); }
+.outside { margin-top: 16px; padding: 14px 18px; border: 1px dashed var(--line); border-radius: 6px; font-size: 14px; color: var(--muted); }
+.outside b { color: var(--ink); }
+
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+
+@media (max-width: 900px) {
+  header.top { grid-template-columns: minmax(0, 1fr); }
+  .variants { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="intro">
+      <span class="eyebrow">Verbouwing begane grond · Leusden</span>
+      <h1>Prins Mauritslaan 8</h1>
+      <p>Twee varianten voor een open woonkeuken op de begane grond, naast de huidige situatie. Daaronder staan de werkzaamheden per optie.</p>
+    </div>
+    <a class="funda" href="https://www.funda.nl/detail/koop/leusden/huis-prins-mauritslaan-8/44572225/" target="_blank" rel="noopener">
+      <span class="eyebrow">Advertentie</span>
+      <span>Prins Mauritslaan 8, Leusden</span>
+      <span class="go">Bekijk op Funda ↗</span>
+    </a>
+  </header>
+
+  <section aria-labelledby="h-plans">
+    <div class="section-head">
+      <div class="lead">
+        <h2 id="h-plans">Huidig en de twee opties</h2>
+        <p>Alle drie op dezelfde schaal. Bovenzijde is de tuin, onderzijde de straat.</p>
+      </div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Weergave">
+          <button type="button" id="mode-2d" aria-pressed="true">2D</button>
+          <button type="button" id="mode-3d" aria-pressed="false">3D</button>
+        </div>
+        <div class="seg" role="group" aria-label="Variant" id="variant-seg" hidden></div>
+      </div>
+    </div>
+
+    <div id="view-2d" class="variants"></div>
+
+    <div id="view-3d" hidden>
+      <div class="viewer" id="viewer">
+        <div class="status" id="viewer-status">3D-model laden…</div>
+        <div class="hint">Slepen om te draaien · scrollen of knijpen om te zoomen · rechts slepen om te verschuiven</div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-work">
+    <div class="section-head">
+      <div class="lead">
+        <h2 id="h-work">Werkzaamheden</h2>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Werkzaamheid</th>
+            <th class="num">Hoeveelheid</th>
+            <th class="check">Optie 1</th>
+            <th class="check">Optie 2</th>
+          </tr>
+        </thead>
+        <tbody id="work-body"></tbody>
+      </table>
+    </div>
+    <div class="outside"><b>Niet in deze offerte:</b> de nieuwe keuken. Die wordt door het keukenbedrijf geplaatst. Het aanpassen van het leidingwerk voor de keuken staat wel hierboven.</div>
+  </section>
+
+  <footer>Bron: Floorplanner-project “Prins Mauritslaan 8”, begane grond. Maten zijn indicatief; controleer ze ter plaatse.</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const PLANS = /*PLANS*/[{"id":"origineel","title":"Huidige situatie","walls":[{"a":{"x":-138,"y":-425},"b":{"x":-138,"y":-133.2},"t":10,"h":257,"openings":[]},{"a":{"x":-138,"y":-425},"b":{"x":-196,"y":-425},"t":30,"h":215,"openings":[]},{"a":{"x":-196,"y":-425},"b":{"x":-196,"y":-133.2},"t":10,"h":215,"openings":[{"type":"door","t":0.6443,"w":180,"z":0,"zh":210},{"type":"door","t":0.1988,"w":80,"z":0,"zh":210}]},{"a":{"x":-138,"y":-133.2},"b":{"x":-196,"y":-133.2},"t":15,"h":257,"openings":[]},{"a":{"x":-138,"y":-133.2},"b":{"x":-138,"y":170.1},"t":10,"h":257,"openings":[{"type":"door","t":0.4333,"w":85,"z":0,"zh":200}]},{"a":{"x":-196,"y":-133.2},"b":{"x":-402,"y":-133.2},"t":15,"h":257,"openings":[{"type":"door","t":0.3445,"w":80,"z":0,"zh":205}]},{"a":{"x":255,"y":173},"b":{"x":125,"y":173},"t":20,"h":257,"openings":[]},{"a":{"x":125,"y":173},"b":{"x":22,"y":173},"t":20,"h":257,"openings":[]},{"a":{"x":125,"y":173},"b":{"x":125,"y":265},"t":10,"h":257,"openings":[]},{"a":{"x":22,"y":173},"b":{"x":22,"y":265},"t":10,"h":257,"openings":[]},{"a":{"x":125,"y":265},"b":{"x":22,"y":265},"t":10,"h":257,"openings":[{"type":"door","t":0.5007,"w":75,"z":0,"zh":200}]},{"a":{"x":-402,"y":170.1},"b":{"x":-402,"y":-133.2},"t":30,"h":257,"openings":[]},{"a":{"x":125,"y":265},"b":{"x":125,"y":361.4},"t":10,"h":257,"openings":[{"type":"door","t":0.4955,"w":75,"z":0,"zh":200}]},{"a":{"x":22,"y":265},"b":{"x":22,"y":565},"t":10,"h":257,"openings":[{"type":"door","t":0.1592,"w":75,"z":0,"zh":200}]},{"a":{"x":255,"y":173},"b":{"x":255,"y":361.4},"t":30,"h":257,"openings":[]},{"a":{"x":255,"y":361.4},"b":{"x":125,"y":361.4},"t":10,"h":257,"openings":[]},{"a":{"x":255,"y":361.4},"b":{"x":255,"y":461.6},"t":30,"h":257,"openings":[]},{"a":{"x":255,"y":461.6},"b":{"x":203,"y":461.6},"t":10,"h":257,"openings":[]},{"a":{"x":74,"y":565},"b":{"x":22,"y":565},"t":10,"h":257,"openings":[]},{"a":{"x":74,"y":565},"b":{"x":74,"y":667},"t":10,"h":257,"openings":[{"type":"door","t":0.4674,"w":75,"z":0,"zh":200}]},{"a":{"x":22,"y":565},"b":{"x":22,"y":667},"t":10,"h":257,"openings":[]},{"a":{"x":22,"y":667},"b":{"x":74,"y":667},"t":30,"h":257,"openings":[]},{"a":{"x":-726,"y":-425},"b":{"x":-726,"y":228},"t":30,"h":215,"openings":[]},{"a":{"x":-402,"y":228},"b":{"x":-402,"y":170.1},"t":30,"h":257,"openings":[]},{"a":{"x":-726,"y":228},"b":{"x":-402,"y":228},"t":30,"h":215,"openings":[{"type":"door","t":0.5133,"w":235,"z":0,"zh":210}]},{"a":{"x":-402,"y":228},"b":{"x":-402,"y":667},"t":30,"h":257,"openings":[{"type":"window","t":0.6093,"w":175,"z":185,"zh":55}]},{"a":{"x":-402,"y":667},"b":{"x":22,"y":667},"t":30,"h":257,"openings":[{"type":"window","t":0.4914,"w":175,"z":90,"zh":160},{"type":"window","t":0.2083,"w":65,"z":90,"zh":160},{"type":"window","t":0.7744,"w":65,"z":90,"zh":160}]},{"a":{"x":255,"y":461.6},"b":{"x":255,"y":667},"t":30,"h":257,"openings":[]},{"a":{"x":74,"y":667},"b":{"x":255,"y":667},"t":25,"h":257,"openings":[{"type":"door","t":0.5538,"w":90,"z":0,"zh":195},{"type":"window","t":0.1809,"w":45,"z":65,"zh":160}]},{"a":{"x":231.3,"y":-425},"b":{"x":231.3,"y":-130.1},"t":30,"h":257,"openings":[]},{"a":{"x":255,"y":-130.1},"b":{"x":255,"y":173},"t":30,"h":257,"openings":[]},{"a":{"x":255,"y":-130.1},"b":{"x":231.3,"y":-130.1},"t":30,"h":257,"openings":[]},{"a":{"x":231.3,"y":-425},"b":{"x":220.6,"y":-425},"t":30,"h":257,"openings":[]},{"a":{"x":220.6,"y":-425},"b":{"x":-138,"y":-425},"t":30,"h":257,"openings":[{"type":"door","t":0.4924,"w":165,"z":0,"zh":210},{"type":"window","t":0.841,"w":85,"z":40,"zh":210},{"type":"window","t":0.1438,"w":85,"z":40,"zh":210},{"type":"window","t":0.4924,"w":165,"z":210,"zh":40}]},{"a":{"x":-196,"y":-425},"b":{"x":-402,"y":-425},"t":30,"h":215,"openings":[{"type":"door","t":0.3554,"w":80,"z":0,"zh":200}]},{"a":{"x":-402,"y":-133.2},"b":{"x":-402,"y":-425},"t":30,"h":215,"openings":[]},{"a":{"x":-402,"y":-425},"b":{"x":-726,"y":-425},"t":30,"h":215,"openings":[{"type":"door","t":0.307,"w":80,"z":0,"zh":200}]},{"a":{"x":-320.6,"y":170.1},"b":{"x":-402,"y":170.1},"t":20,"h":257,"openings":[]},{"a":{"x":-138,"y":170.1},"b":{"x":-229.8,"y":170.1},"t":20,"h":257,"openings":[]},{"a":{"x":-229.8,"y":170.1},"b":{"x":-320.6,"y":170.1},"t":20,"h":257,"openings":[]},{"a":{"x":-229.8,"y":237.7},"b":{"x":-229.8,"y":170.1},"t":10,"h":257,"openings":[]},{"a":{"x":-320.6,"y":170.1},"b":{"x":-320.6,"y":237.7},"t":10,"h":257,"openings":[]},{"a":{"x":-320.6,"y":237.7},"b":{"x":-229.8,"y":237.7},"t":10,"h":257,"openings":[{"type":"door","t":0.5009,"w":47,"z":47,"zh":51}]}],"areas":[{"name":"Bijkeuken","color":"#ceedf2","m2":5.01,"poly":[{"x":-387,"y":-140.7},{"x":-201,"y":-140.7},{"x":-201,"y":-410},{"x":-387,"y":-410}]},{"name":"MK","color":"#dfbf8d","m2":0.34,"poly":[{"x":27,"y":652},{"x":69,"y":652},{"x":69,"y":570},{"x":27,"y":570}]},{"name":"Toilet","color":"#c3c4d9","m2":0.72,"poly":[{"x":27,"y":260},{"x":120,"y":260},{"x":120,"y":183},{"x":27,"y":183}]},{"name":"Garage","color":"#f4f4f4","m2":18.32,"poly":[{"x":-711,"y":213},{"x":-417,"y":213},{"x":-417,"y":170.1},{"x":-417,"y":-133.2},{"x":-417,"y":-410},{"x":-711,"y":-410}]},{"name":"Woonkamer","color":"#ffdec2","m2":39.36,"poly":[{"x":-387,"y":652},{"x":17,"y":652},{"x":17,"y":565},{"x":17,"y":265},{"x":17,"y":163},{"x":125,"y":163},{"x":240,"y":163.0},{"x":240.0,"y":-115.1},{"x":216.3,"y":-115.1},{"x":216.3,"y":-410.0},{"x":220.6,"y":-410},{"x":-133,"y":-410},{"x":-133,"y":-133.2},{"x":-133,"y":180.1},{"x":-224.8,"y":180.1},{"x":-224.8,"y":242.7},{"x":-325.6,"y":242.7},{"x":-325.6,"y":180.1},{"x":-387,"y":180.1},{"x":-387,"y":228}]},{"name":"Keuken","color":"#ceedf2","m2":6.97,"poly":[{"x":-387.0,"y":160.1},{"x":-320.6,"y":160.1},{"x":-229.8,"y":160.1},{"x":-143,"y":160.1},{"x":-143,"y":-125.7},{"x":-196,"y":-125.7},{"x":-387.0,"y":-125.7}]},{"name":"Column","color":"#ffffff","m2":0.43,"poly":[{"x":-315.6,"y":232.7},{"x":-234.8,"y":232.7},{"x":-234.8,"y":180.1},{"x":-315.6,"y":180.1}]},{"name":"Kast","color":"#dfbf8d","m2":1.29,"poly":[{"x":-191.0,"y":-140.7},{"x":-143,"y":-140.7},{"x":-143,"y":-410.0},{"x":-191,"y":-410.0}]},{"name":"Column","color":"#ffffff","m2":1.91,"poly":[{"x":130.0,"y":356.4},{"x":240,"y":356.4},{"x":240.0,"y":183},{"x":130,"y":183.0},{"x":130,"y":265}]},{"name":"Entree","color":"#fee799","m2":6.5,"poly":[{"x":27,"y":560},{"x":79,"y":560},{"x":79,"y":652},{"x":240.0,"y":652},{"x":240.0,"y":466.6},{"x":240,"y":456.6},{"x":240.0,"y":366.4},{"x":120.0,"y":366.4},{"x":120.0,"y":270.0},{"x":27,"y":270}]}],"items":[{"x":-357,"y":-300.2,"z":0,"w":219.7,"d":60,"zh":90,"rot":-90},{"x":-174.5,"y":130.6,"z":0,"w":63.1,"d":58.8,"zh":220,"rot":-180},{"x":-357,"y":-12.2,"z":0,"w":226.85,"d":60,"zh":90,"rot":-90},{"x":-356.1,"y":-28.9,"z":90,"w":86.2,"d":49.9,"zh":4,"rot":-90},{"x":-292.2,"y":136.5,"z":90,"w":48.4,"d":40.8,"zh":27,"rot":-180},{"x":-296.5,"y":130.7,"z":0,"w":181.1,"d":59.1,"zh":90,"rot":-180},{"x":95.6,"y":224.4,"z":0,"w":34.3,"d":48.9,"zh":44.6,"rot":90},{"x":185,"y":277.8,"z":0,"w":110,"d":159.3,"zh":115.5,"rot":0},{"x":-380.4,"y":-165.7,"z":0,"w":13.2,"d":50,"zh":215,"rot":0},{"x":32.6,"y":460,"z":0,"w":11.1,"d":20,"zh":257,"rot":0},{"x":-356.3,"y":223.8,"z":0,"w":61.5,"d":87.5,"zh":45.4,"rot":0},{"x":-211.8,"y":223.8,"z":0,"w":26.1,"d":87.5,"zh":45.4,"rot":0},{"x":-275.2,"y":255.3,"z":0,"w":24.6,"d":100.74999999999997,"zh":45.4,"rot":-90},{"x":-436.8,"y":-348.3,"z":120,"w":45,"d":39.7,"zh":73.5,"rot":-90},{"x":43.1,"y":198.9,"z":0,"w":32.3,"d":31.9,"zh":101.3,"rot":0},{"x":40.5,"y":601.9,"z":0,"w":53.4,"d":27,"zh":257,"rot":-90}],"surfaces":[{"name":"Overkapping","poly":[{"x":225.3,"y":677},{"x":225.3,"y":735.7},{"x":19.2,"y":735.7},{"x":19.2,"y":682},{"x":73.6,"y":682},{"x":73.6,"y":677}]}],"dims":[{"a":{"x":-848.1,"y":-410.0},"b":{"x":-848.1,"y":213.0}},{"a":{"x":-387,"y":-555},"b":{"x":-146,"y":-555}},{"a":{"x":383.3,"y":652},"b":{"x":383.3,"y":186}},{"a":{"x":-133,"y":-555},"b":{"x":216,"y":-555}},{"a":{"x":335,"y":681.9},"b":{"x":335,"y":735.9}},{"a":{"x":-806,"y":-140.7},"b":{"x":-806,"y":-407.7}},{"a":{"x":19.2,"y":815.7},"b":{"x":225.3,"y":815.7}},{"a":{"x":27,"y":865.7},"b":{"x":242,"y":865.7}},{"a":{"x":335,"y":270},"b":{"x":335,"y":649}},{"a":{"x":-133,"y":-608.1},"b":{"x":239,"y":-608.1}},{"a":{"x":-387,"y":-608.1},"b":{"x":-142,"y":-608.1}},{"a":{"x":-417,"y":865.7},"b":{"x":-711,"y":865.7}},{"a":{"x":-387,"y":865.7},"b":{"x":16.0,"y":865.7}},{"a":{"x":-387.0,"y":-655},"b":{"x":240.0,"y":-655}},{"a":{"x":435.0,"y":-410.0},"b":{"x":435.0,"y":652.0}},{"a":{"x":383.3,"y":163.0},"b":{"x":383.3,"y":-410.0}},{"a":{"x":-711.2,"y":-707.4},"b":{"x":240.2,"y":-707.4}}],"labels":[{"x":-561.6,"y":-75.7,"text":"H = 2.15m"},{"x":-268.9,"y":-249.4,"text":"H = 2.16m"},{"x":38.0,"y":-41.7,"text":"H = 2.57m"}]},{"id":"optie1","title":"Optie 1 · Bijkeuken blijft","walls":[{"a":{"x":74.2,"y":565.4},"b":{"x":74.2,"y":667.4},"t":10,"h":257,"openings":[{"type":"door","t":0.4674,"w":75,"z":0,"zh":200}]},{"a":{"x":22.2,"y":667.4},"b":{"x":74.2,"y":667.4},"t":30,"h":257,"openings":[]},{"a":{"x":-725.8,"y":-424.6},"b":{"x":-725.8,"y":228.4},"t":30,"h":215,"openings":[]},{"a":{"x":-725.8,"y":228.4},"b":{"x":-401.8,"y":228.4},"t":30,"h":215,"openings":[{"type":"door","t":0.5133,"w":235,"z":0,"zh":210}]},{"a":{"x":-401.8,"y":228.4},"b":{"x":-401.8,"y":667.4},"t":30,"h":257,"openings":[{"type":"window","t":0.6093,"w":175,"z":185,"zh":55}]},{"a":{"x":231.5,"y":-424.6},"b":{"x":231.5,"y":-129.7},"t":30,"h":257,"openings":[]},{"a":{"x":231.5,"y":-424.6},"b":{"x":220.8,"y":-424.6},"t":30,"h":257,"openings":[]},{"a":{"x":-401.8,"y":-424.6},"b":{"x":-725.8,"y":-424.6},"t":30,"h":215,"openings":[{"type":"door","t":0.307,"w":80,"z":0,"zh":200}]},{"a":{"x":255.2,"y":-129.7},"b":{"x":231.5,"y":-129.7},"t":30,"h":257,"openings":[]},{"a":{"x":255.2,"y":-129.7},"b":{"x":255.2,"y":187.9},"t":30,"h":257,"openings":[]},{"a":{"x":255.2,"y":187.9},"b":{"x":255.2,"y":233.4},"t":30,"h":257,"openings":[]},{"a":{"x":74.2,"y":667.4},"b":{"x":255.2,"y":667.4},"t":25,"h":257,"openings":[{"type":"window","t":0.1809,"w":45,"z":65,"zh":160},{"type":"door","t":0.5538,"w":90,"z":0,"zh":195}]},{"a":{"x":255.2,"y":480.6},"b":{"x":255.2,"y":667.4},"t":30,"h":257,"openings":[]},{"a":{"x":74.2,"y":565.4},"b":{"x":22.2,"y":565.4},"t":10,"h":257,"openings":[]},{"a":{"x":22.2,"y":565.4},"b":{"x":22.2,"y":667.4},"t":10,"h":257,"openings":[]},{"a":{"x":220.8,"y":-424.6},"b":{"x":-137.8,"y":-424.6},"t":30,"h":257,"openings":[{"type":"door","t":0.4924,"w":200,"z":0,"zh":250},{"type":"window","t":0.116,"w":70,"z":0,"zh":250},{"type":"window","t":0.8689,"w":70,"z":0,"zh":250}]},{"a":{"x":-401.8,"y":667.4},"b":{"x":22.2,"y":667.4},"t":30,"h":257,"openings":[{"type":"window","t":0.4823,"w":175,"z":90,"zh":160},{"type":"window","t":0.1993,"w":65,"z":90,"zh":160},{"type":"window","t":0.7653,"w":65,"z":90,"zh":160}]},{"a":{"x":255.2,"y":187.9},"b":{"x":125.1,"y":188.1},"t":20,"h":257,"openings":[]},{"a":{"x":22.2,"y":265.9},"b":{"x":22.2,"y":565.4},"t":10,"h":257,"openings":[]},{"a":{"x":125.1,"y":188.1},"b":{"x":124.9,"y":265.9},"t":10,"h":257,"openings":[]},{"a":{"x":124.9,"y":265.9},"b":{"x":22.2,"y":265.9},"t":10,"h":257,"openings":[{"type":"door","t":0.5116,"w":95,"z":0,"zh":220}]},{"a":{"x":-195.8,"y":-424.6},"b":{"x":-195.8,"y":-132.8},"t":10,"h":215,"openings":[{"type":"door","t":0.6443,"w":180,"z":0,"zh":210},{"type":"door","t":0.1988,"w":80,"z":0,"zh":210}]},{"a":{"x":-137.8,"y":-132.3},"b":{"x":-130.7,"y":-132.3},"t":15,"h":215,"openings":[]},{"a":{"x":240.7,"y":479.6},"b":{"x":160.2,"y":479.6},"t":10,"h":257,"openings":[]},{"a":{"x":-137.8,"y":-132.3},"b":{"x":-137.8,"y":-424.6},"t":15,"h":257,"openings":[]},{"a":{"x":-195.8,"y":-132.8},"b":{"x":-137.8,"y":-132.3},"t":15,"h":257,"openings":[]},{"a":{"x":-137.8,"y":-424.6},"b":{"x":-195.8,"y":-424.6},"t":30,"h":257,"openings":[]},{"a":{"x":-195.8,"y":-424.6},"b":{"x":-401.8,"y":-424.6},"t":30,"h":257,"openings":[{"type":"door","t":0.3554,"w":80,"z":0,"zh":200}]},{"a":{"x":-195.8,"y":-132.8},"b":{"x":-401.8,"y":-132.8},"t":15,"h":257,"openings":[{"type":"door","t":0.3445,"w":80,"z":0,"zh":205}]},{"a":{"x":-401.8,"y":-132.8},"b":{"x":-401.8,"y":-424.6},"t":30,"h":257,"openings":[]},{"a":{"x":-401.8,"y":228.4},"b":{"x":-401.8,"y":188.0},"t":30,"h":257,"openings":[]},{"a":{"x":-401.8,"y":188.0},"b":{"x":-401.8,"y":170.5},"t":30,"h":257,"openings":[]},{"a":{"x":-401.8,"y":170.5},"b":{"x":-401.8,"y":-132.8},"t":30,"h":257,"openings":[]},{"a":{"x":-217.3,"y":187.8},"b":{"x":-133.2,"y":188.1},"t":20,"h":257,"openings":[]},{"a":{"x":-401.8,"y":188.0},"b":{"x":-329.5,"y":187.8},"t":20,"h":257,"openings":[]},{"a":{"x":-329.5,"y":187.8},"b":{"x":-217.3,"y":187.8},"t":20,"h":90,"openings":[]},{"a":{"x":255.2,"y":233.4},"b":{"x":255.2,"y":361.8},"t":30,"h":257,"openings":[]},{"a":{"x":255.2,"y":361.8},"b":{"x":255.2,"y":480.6},"t":30,"h":257,"openings":[]},{"a":{"x":131.8,"y":362.3},"b":{"x":255.2,"y":361.8},"t":10,"h":257,"openings":[]},{"a":{"x":131.8,"y":362.3},"b":{"x":132.2,"y":454.8},"t":10,"h":257,"openings":[{"type":"door","t":0.5173,"w":75,"z":0,"zh":200}]},{"a":{"x":132.2,"y":454.8},"b":{"x":160.2,"y":479.6},"t":10,"h":257,"openings":[]}],"areas":[{"name":"Garage","color":"#f4f4f4","m2":18.32,"poly":[{"x":-710.8,"y":213.4},{"x":-416.8,"y":213.4},{"x":-416.8,"y":188.0},{"x":-416.8,"y":170.5},{"x":-416.8,"y":-132.8},{"x":-416.8,"y":-409.6},{"x":-710.8,"y":-409.6}]},{"name":"Woonkamer","color":"#ffdec2","m2":48.87,"poly":[{"x":-386.8,"y":198.0},{"x":-386.8,"y":228.4},{"x":-386.8,"y":652.4},{"x":17.2,"y":652.4},{"x":17.2,"y":565.4},{"x":17.2,"y":260.9},{"x":119.9,"y":260.9},{"x":120.1,"y":178.1},{"x":240.2,"y":177.9},{"x":240.2,"y":-114.7},{"x":216.5,"y":-114.7},{"x":216.5,"y":-409.6},{"x":220.8,"y":-409.6},{"x":-130.3,"y":-409.6},{"x":-130.3,"y":-139.8},{"x":-137.9,"y":-124.8},{"x":-195.8,"y":-125.3},{"x":-386.8,"y":-125.3},{"x":-386.8,"y":170.5},{"x":-386.8,"y":178.0}]},{"name":"Bijkeuken","color":"#ceedf2","m2":5.01,"poly":[{"x":-386.8,"y":-140.3},{"x":-200.8,"y":-140.3},{"x":-200.8,"y":-409.6},{"x":-386.8,"y":-409.6}]},{"name":"Kast","color":"#ffdec2","m2":1.23,"poly":[{"x":-190.8,"y":-140.3},{"x":-145.3,"y":-139.9},{"x":-145.3,"y":-409.6},{"x":-190.8,"y":-409.6}]},{"name":"Hal + toilet","color":"#F4F4F4","m2":8.45,"poly":[{"x":27.2,"y":270.9},{"x":27.2,"y":560.4},{"x":79.2,"y":560.4},{"x":79.2,"y":652.4},{"x":240.2,"y":652.4},{"x":240.2,"y":480.6},{"x":240.2,"y":366.9},{"x":240.2,"y":356.9},{"x":240.2,"y":233.4},{"x":240.2,"y":197.9},{"x":130.1,"y":198.1},{"x":129.9,"y":270.9}]},{"name":"MK","color":"#dfbf8d","m2":0.34,"poly":[{"x":27.2,"y":652.4},{"x":69.2,"y":652.4},{"x":69.2,"y":570.4},{"x":27.2,"y":570.4}]}],"items":[{"x":-356.8,"y":-299.8,"z":0,"w":219.7,"d":60,"zh":90,"rot":-90},{"x":-380.2,"y":-165.3,"z":0,"w":13.2,"d":50,"zh":215,"rot":0},{"x":-436.6,"y":-347.9,"z":120,"w":45,"d":39.7,"zh":73.5,"rot":-90},{"x":40.7,"y":602.3,"z":0,"w":53.4,"d":27,"zh":257,"rot":-90},{"x":224.1,"y":453.2,"z":0,"w":32.3,"d":31.9,"zh":101.3,"rot":180},{"x":185.1,"y":382.3,"z":0,"w":34.3,"d":48.9,"zh":44.6,"rot":0},{"x":50.3,"y":-135.3,"z":76.2,"w":23,"d":23,"zh":22.24,"rot":90},{"x":48.6,"y":-133.9,"z":0,"w":320.446,"d":185.946,"zh":83.842,"rot":90},{"x":218.1,"y":1.9,"z":0,"w":112.028,"d":44.152,"zh":220,"rot":90},{"x":201.2,"y":-328.5,"z":0,"w":90.242,"d":30.592,"zh":195.58,"rot":90},{"x":-187.8,"y":424.3,"z":0,"w":122.682,"d":70.612,"zh":34.798,"rot":270},{"x":-366.5,"y":423.7,"z":0,"w":180,"d":40.651,"zh":55.876,"rot":270},{"x":-364.2,"y":538.4,"z":0,"w":22,"d":22.67,"zh":97.61,"rot":266.18986468277393},{"x":-363.7,"y":310.8,"z":0,"w":22,"d":22.67,"zh":97.61,"rot":278.18797065334354},{"x":-385.8,"y":422.7,"z":70,"w":145.7,"d":2,"zh":83.2,"rot":90},{"x":-296.7,"y":581.2,"z":0,"w":90.938,"d":86.395,"zh":101.39,"rot":209.6119842529297},{"x":-87.0,"y":-364.4,"z":0,"w":77.769,"d":89.109,"zh":121.68,"rot":264.4114990234375},{"x":-172.8,"y":191.7,"z":115.81100463867188,"w":24.932,"d":23.933,"zh":118.378,"rot":180},{"x":237.1,"y":553.9,"z":136.9,"w":71.12,"d":7.531,"zh":76.2,"rot":270},{"x":229.7,"y":513.0,"z":0,"w":51,"d":21.053,"zh":117,"rot":90},{"x":230.4,"y":564.0,"z":0,"w":51,"d":21.053,"zh":117,"rot":90},{"x":230.4,"y":615.0,"z":0,"w":51,"d":21.053,"zh":117,"rot":90},{"x":230.0,"y":568.1,"z":117.18965911865234,"w":167,"d":20.32,"zh":5.08,"rot":270},{"x":30.4,"y":496.9,"z":173.2893524169922,"w":88.9,"d":6.35,"zh":6.372,"rot":90},{"x":178.0,"y":116.5,"z":0,"w":89.978,"d":74.348,"zh":222.022,"rot":0},{"x":-273.3,"y":187.7,"z":200,"w":112,"d":20.32,"zh":5.08,"rot":0},{"x":-273.3,"y":187.7,"z":146.12722778320312,"w":112,"d":20.32,"zh":5.08,"rot":0},{"x":-273.3,"y":187.7,"z":90.19913482666016,"w":112,"d":20.32,"zh":5.08,"rot":180},{"x":-291.9,"y":187.7,"z":205.18,"w":20.066,"d":20.176,"zh":24.346,"rot":180},{"x":-229.4,"y":148.0,"z":0,"w":191,"d":59,"zh":78,"rot":180},{"x":-355.9,"y":28.0,"z":0,"w":303,"d":61.88,"zh":257,"rot":270},{"x":185.1,"y":277.7,"z":0,"w":110,"d":159.3,"zh":115.5,"rot":0},{"x":-283.9,"y":269.8,"z":0,"w":121.022,"d":99.06,"zh":96.52,"rot":332.2475891113281},{"x":-12.9,"y":263.3,"z":0,"w":49.668,"d":46.336,"zh":69.797,"rot":250.50767517089844},{"x":-86.8,"y":473.4,"z":0,"w":358,"d":208,"zh":97.515,"rot":90}],"surfaces":[{"name":"Overkapping","poly":[{"x":225.5,"y":677.4},{"x":225.5,"y":736.1},{"x":19.4,"y":736.1},{"x":19.4,"y":682.4},{"x":73.8,"y":682.4},{"x":73.8,"y":677.4}]}],"dims":[{"a":{"x":-847.9,"y":-409.6},"b":{"x":-847.9,"y":213.4}},{"a":{"x":-386.8,"y":-554.6},"b":{"x":-145.8,"y":-554.6}},{"a":{"x":-132.8,"y":-554.6},"b":{"x":216.2,"y":-554.6}},{"a":{"x":-805.8,"y":-140.3},"b":{"x":-805.8,"y":-407.3}},{"a":{"x":19.4,"y":816.1},"b":{"x":225.5,"y":816.1}},{"a":{"x":27.2,"y":866.1},"b":{"x":242.2,"y":866.1}},{"a":{"x":-132.8,"y":-607.7},"b":{"x":239.2,"y":-607.7}},{"a":{"x":-386.8,"y":-607.7},"b":{"x":-141.8,"y":-607.7}},{"a":{"x":-416.8,"y":866.1},"b":{"x":-710.8,"y":866.1}},{"a":{"x":-386.8,"y":866.1},"b":{"x":16.2,"y":866.1}},{"a":{"x":-386.8,"y":-654.6},"b":{"x":240.2,"y":-654.6}},{"a":{"x":-710.9,"y":-707.0},"b":{"x":240.4,"y":-707.0}}],"labels":[{"x":-561.4,"y":-75.3,"text":"H = 2.15m"},{"x":-268.7,"y":-249.0,"text":"H = 2.16m"},{"x":38.2,"y":-41.3,"text":"H = 2.57m"}]},{"id":"optie2","title":"Optie 2 · Bijkeuken naar garage","walls":[{"a":{"x":73.7,"y":564.9},"b":{"x":21.7,"y":564.9},"t":10,"h":257,"openings":[]},{"a":{"x":73.7,"y":564.9},"b":{"x":73.7,"y":666.9},"t":10,"h":257,"openings":[{"type":"door","t":0.4674,"w":75,"z":0,"zh":200}]},{"a":{"x":21.7,"y":564.9},"b":{"x":21.7,"y":666.9},"t":10,"h":257,"openings":[]},{"a":{"x":21.7,"y":666.9},"b":{"x":73.7,"y":666.9},"t":30,"h":257,"openings":[]},{"a":{"x":-402.3,"y":227.9},"b":{"x":-402.3,"y":666.9},"t":30,"h":257,"openings":[{"type":"window","t":0.6093,"w":175,"z":185,"zh":55}]},{"a":{"x":-402.3,"y":666.9},"b":{"x":21.7,"y":666.9},"t":30,"h":257,"openings":[{"type":"window","t":0.4914,"w":175,"z":90,"zh":160},{"type":"window","t":0.2083,"w":65,"z":90,"zh":160},{"type":"window","t":0.7744,"w":65,"z":90,"zh":160}]},{"a":{"x":254.7,"y":-130.2},"b":{"x":254.7,"y":172.9},"t":30,"h":257,"openings":[]},{"a":{"x":254.7,"y":-130.2},"b":{"x":231.0,"y":-130.2},"t":30,"h":257,"openings":[]},{"a":{"x":231.0,"y":-425.1},"b":{"x":220.3,"y":-425.1},"t":30,"h":257,"openings":[]},{"a":{"x":-402.3,"y":-105.1},"b":{"x":-402.3,"y":-133.3},"t":30,"h":257,"openings":[]},{"a":{"x":-726.3,"y":-425.1},"b":{"x":-726.3,"y":-105.1},"t":30,"h":215,"openings":[]},{"a":{"x":-726.3,"y":-105.1},"b":{"x":-726.3,"y":227.9},"t":30,"h":215,"openings":[]},{"a":{"x":-402.3,"y":-425.1},"b":{"x":-726.3,"y":-425.1},"t":30,"h":215,"openings":[{"type":"door","t":0.307,"w":80,"z":0,"zh":200},{"type":"window","t":0.7001,"w":98,"z":50,"zh":150}]},{"a":{"x":-726.3,"y":-105.1},"b":{"x":-402.3,"y":-105.1},"t":15,"h":215,"openings":[{"type":"door","t":0.6894,"w":98,"z":0,"zh":220}]},{"a":{"x":-726.3,"y":227.9},"b":{"x":-402.3,"y":227.9},"t":30,"h":215,"openings":[{"type":"door","t":0.4875,"w":188,"z":0,"zh":220}]},{"a":{"x":-402.3,"y":227.9},"b":{"x":-402.3,"y":170.0},"t":30,"h":257,"openings":[]},{"a":{"x":-402.3,"y":170.0},"b":{"x":-402.3,"y":-105.1},"t":30,"h":257,"openings":[]},{"a":{"x":254.7,"y":172.9},"b":{"x":124.7,"y":172.9},"t":20,"h":257,"openings":[]},{"a":{"x":21.7,"y":264.9},"b":{"x":21.7,"y":564.9},"t":10,"h":257,"openings":[]},{"a":{"x":231.0,"y":-425.1},"b":{"x":231.0,"y":-130.2},"t":30,"h":257,"openings":[]},{"a":{"x":73.7,"y":666.9},"b":{"x":254.7,"y":666.9},"t":25,"h":257,"openings":[{"type":"door","t":0.5538,"w":90,"z":0,"zh":195},{"type":"window","t":0.1809,"w":45,"z":65,"zh":160}]},{"a":{"x":254.7,"y":491.5},"b":{"x":254.7,"y":666.9},"t":30,"h":257,"openings":[]},{"a":{"x":220.3,"y":-425.1},"b":{"x":-402.3,"y":-425.1},"t":30,"h":257,"openings":[{"type":"door","t":0.2836,"w":165,"z":0,"zh":210},{"type":"window","t":0.4844,"w":85,"z":40,"zh":210},{"type":"window","t":0.0828,"w":85,"z":40,"zh":210},{"type":"window","t":0.2836,"w":165,"z":210,"zh":40},{"type":"window","t":0.7581,"w":200,"z":5,"zh":245}]},{"a":{"x":-402.3,"y":-133.3},"b":{"x":-402.3,"y":-425.1},"t":30,"h":257,"openings":[{"type":"door","t":0.5829,"w":98,"z":0,"zh":200}]},{"a":{"x":-402.3,"y":170.0},"b":{"x":-327.6,"y":169.7},"t":20,"h":257,"openings":[]},{"a":{"x":-327.6,"y":169.7},"b":{"x":-216.4,"y":170.0},"t":20,"h":257,"openings":[]},{"a":{"x":-216.4,"y":170.0},"b":{"x":-204.2,"y":170.0},"t":20,"h":257,"openings":[]},{"a":{"x":-204.2,"y":170.0},"b":{"x":-132.4,"y":170.0},"t":20,"h":257,"openings":[]},{"a":{"x":-327.6,"y":169.7},"b":{"x":-204.2,"y":170.0},"t":20,"h":90,"openings":[]},{"a":{"x":254.7,"y":172.9},"b":{"x":254.7,"y":361.3},"t":30,"h":257,"openings":[]},{"a":{"x":254.7,"y":361.3},"b":{"x":254.7,"y":491.5},"t":30,"h":257,"openings":[]},{"a":{"x":254.7,"y":361.3},"b":{"x":133.8,"y":361.3},"t":10,"h":257,"openings":[]},{"a":{"x":240.1,"y":491.5},"b":{"x":167.9,"y":491.5},"t":10,"h":257,"openings":[]},{"a":{"x":133.8,"y":463.8},"b":{"x":167.9,"y":491.5},"t":10,"h":257,"openings":[]},{"a":{"x":133.8,"y":361.3},"b":{"x":133.8,"y":463.8},"t":10,"h":257,"openings":[{"type":"door","t":0.5198,"w":75,"z":0,"zh":200}]},{"a":{"x":124.7,"y":172.9},"b":{"x":124.7,"y":264.9},"t":10,"h":257,"openings":[]},{"a":{"x":124.7,"y":264.9},"b":{"x":21.7,"y":264.9},"t":10,"h":257,"openings":[{"type":"door","t":0.4988,"w":85,"z":0,"zh":220}]}],"areas":[{"name":"Garage","color":"#f4f4f4","m2":9.13,"poly":[{"x":-711.3,"y":212.9},{"x":-417.3,"y":212.9},{"x":-417.3,"y":170.0},{"x":-417.3,"y":-97.6},{"x":-711.3,"y":-97.6}]},{"name":"Bijkeuken (nieuw)","color":"#f4f4f4","m2":8.75,"poly":[{"x":-711.3,"y":-112.6},{"x":-417.3,"y":-112.6},{"x":-417.3,"y":-133.3},{"x":-417.3,"y":-410.1},{"x":-711.3,"y":-410.1}]},{"name":"Woonkeuken","color":"#F2D8B0","m2":55.62,"poly":[{"x":-387.3,"y":651.9},{"x":16.7,"y":651.9},{"x":16.7,"y":564.9},{"x":16.7,"y":259.9},{"x":119.7,"y":259.9},{"x":119.7,"y":162.9},{"x":239.7,"y":162.9},{"x":239.7,"y":-115.2},{"x":216.0,"y":-115.2},{"x":216.0,"y":-410.1},{"x":220.3,"y":-410.1},{"x":-387.3,"y":-410.1},{"x":-387.3,"y":-133.3},{"x":-387.3,"y":-105.1},{"x":-387.3,"y":159.9},{"x":-327.6,"y":159.7},{"x":-204.2,"y":160.0},{"x":-204.2,"y":180.0},{"x":-216.4,"y":180.0},{"x":-327.6,"y":179.7},{"x":-387.3,"y":179.9},{"x":-387.3,"y":227.9}]},{"name":"Woonkeuken","color":"#F2D8B0","m2":0.25,"poly":[{"x":-327.6,"y":159.7},{"x":-216.4,"y":160.0},{"x":-204.2,"y":160.0},{"x":-204.2,"y":180.0},{"x":-327.6,"y":179.7}]},{"name":"Hal + toilet","color":"#F4F4F4","m2":8.62,"poly":[{"x":26.7,"y":269.9},{"x":26.7,"y":559.9},{"x":78.7,"y":559.9},{"x":78.7,"y":651.9},{"x":239.7,"y":651.9},{"x":239.7,"y":491.5},{"x":239.7,"y":366.3},{"x":239.7,"y":356.3},{"x":239.7,"y":182.9},{"x":129.7,"y":182.9},{"x":129.7,"y":269.9}]},{"name":"MK","color":"#dfbf8d","m2":0.34,"poly":[{"x":26.7,"y":651.9},{"x":68.7,"y":651.9},{"x":68.7,"y":569.9},{"x":26.7,"y":569.9}]}],"items":[{"x":184.7,"y":277.7,"z":0,"w":110,"d":159.3,"zh":115.5,"rot":0},{"x":40.2,"y":601.8,"z":0,"w":53.4,"d":27,"zh":257,"rot":-90},{"x":-682.3,"y":-335.7,"z":0,"w":60.1,"d":58.136,"zh":85,"rot":270},{"x":-680.8,"y":-275.7,"z":0,"w":59.818,"d":60.996,"zh":83.96,"rot":270},{"x":-673.2,"y":-143.2,"z":0,"w":76.2,"d":61.204,"zh":222.045,"rot":180},{"x":-597.0,"y":-143.2,"z":0,"w":76.2,"d":61.204,"zh":222.045,"rot":180},{"x":-188.4,"y":423.7,"z":0,"w":122.682,"d":70.612,"zh":34.798,"rot":270},{"x":-386.3,"y":443.4,"z":70,"w":145.7,"d":2,"zh":83.2,"rot":90},{"x":-367.0,"y":443.5,"z":0,"w":180,"d":40.651,"zh":55.876,"rot":270},{"x":-356.4,"y":-30.1,"z":0,"w":380,"d":61.88,"zh":257,"rot":270},{"x":200.7,"y":-329.0,"z":0,"w":90.242,"d":30.592,"zh":195.58,"rot":90},{"x":223.5,"y":470.5,"z":0,"w":32.3,"d":31.9,"zh":101.3,"rot":180},{"x":-136.3,"y":-359.2,"z":0,"w":89.978,"d":74.348,"zh":222.022,"rot":0},{"x":217.6,"y":1.4,"z":0,"w":112.028,"d":44.152,"zh":220,"rot":90},{"x":183.4,"y":101.9,"z":0,"w":77.769,"d":89.109,"zh":121.68,"rot":0},{"x":-159.0,"y":37.9,"z":90,"w":25.332,"d":25.332,"zh":12.7,"rot":0},{"x":-285.6,"y":255.0,"z":0,"w":121.022,"d":99.06,"zh":96.52,"rot":332.2475891113281},{"x":48.1,"y":-134.4,"z":0,"w":320.446,"d":185.946,"zh":83.842,"rot":90},{"x":49.8,"y":-135.8,"z":76.2,"w":23,"d":23,"zh":22.24,"rot":90},{"x":-168.8,"y":192.0,"z":115.81100463867188,"w":24.932,"d":23.933,"zh":118.378,"rot":180},{"x":-174.5,"y":-65.2,"z":0,"w":250,"d":100,"zh":90,"rot":90},{"x":29.2,"y":514.6,"z":173.5,"w":88.9,"d":6.35,"zh":6.372,"rot":90},{"x":229.1,"y":574.8,"z":0,"w":51,"d":21.053,"zh":117,"rot":90},{"x":229.1,"y":625.8,"z":0,"w":51,"d":21.053,"zh":117,"rot":90},{"x":229.1,"y":523.8,"z":0,"w":51,"d":21.053,"zh":117,"rot":90},{"x":235.9,"y":571.6,"z":136.9,"w":71.12,"d":7.531,"zh":76.2,"rot":270},{"x":228.8,"y":573.8,"z":117.18965911865234,"w":155,"d":20.32,"zh":5.08,"rot":270},{"x":189.4,"y":392.6,"z":0,"w":34.3,"d":48.9,"zh":44.6,"rot":0},{"x":-371.6,"y":636.3,"z":0,"w":22,"d":22.67,"zh":97.61,"rot":232.0744171142578},{"x":-371.6,"y":195.6,"z":0,"w":22,"d":22.67,"zh":97.61,"rot":309.8055710922651},{"x":-357.2,"y":322.3,"z":0,"w":49.668,"d":46.336,"zh":69.797,"rot":250.50767517089844},{"x":-87.3,"y":472.9,"z":0,"w":358,"d":208,"zh":97.515,"rot":90},{"x":-291.5,"y":586.3,"z":0,"w":90.938,"d":86.395,"zh":101.39,"rot":194.9368320715995}],"surfaces":[{"name":"Overkapping","poly":[{"x":224.9,"y":676.9},{"x":224.9,"y":735.6},{"x":18.8,"y":735.6},{"x":18.8,"y":681.9},{"x":73.3,"y":681.9},{"x":73.3,"y":676.9}]}],"dims":[{"a":{"x":-848.5,"y":-410.1},"b":{"x":-848.5,"y":212.9}},{"a":{"x":-387.3,"y":-555.1},"b":{"x":-146.3,"y":-555.1}},{"a":{"x":-133.3,"y":-555.1},"b":{"x":215.7,"y":-555.1}},{"a":{"x":-806.3,"y":-140.8},"b":{"x":-806.3,"y":-407.8}},{"a":{"x":18.8,"y":815.6},"b":{"x":224.9,"y":815.6}},{"a":{"x":26.7,"y":865.6},"b":{"x":241.7,"y":865.6}},{"a":{"x":-133.3,"y":-608.2},"b":{"x":238.7,"y":-608.2}},{"a":{"x":-387.3,"y":-608.2},"b":{"x":-142.3,"y":-608.2}},{"a":{"x":-417.3,"y":865.6},"b":{"x":-711.3,"y":865.6}},{"a":{"x":-387.3,"y":865.6},"b":{"x":15.7,"y":865.6}},{"a":{"x":-387.3,"y":-655.1},"b":{"x":239.7,"y":-655.1}},{"a":{"x":-711.5,"y":-707.5},"b":{"x":239.8,"y":-707.5}}],"labels":[{"x":-561.9,"y":-75.8,"text":"H = 2.15m"},{"x":-269.2,"y":-249.5,"text":"H = 2.16m"},{"x":167.0,"y":100.3,"text":"H = 2.57m"}]}]/*END*/;
+
+const CHANGES = {
+  origineel: ["Keuken is een aparte, dichte ruimte", "Bijkeuken en kast aan de tuinzijde", "Toilet direct naast de entree"],
+  optie1: ["Opening in de muur tussen keuken en woonkamer", "Bijkeuken blijft zoals hij is", "Toilet schuift op, hal wordt kleiner"],
+  optie2: ["Oude bijkeuken gaat op in de woonkeuken", "Achterste deel van de garage wordt bijkeuken", "Nieuwe pui aan de tuinzijde", "Toilet schuift op, hal wordt kleiner", "Opening tussen keuken en woonkamer zoals bij optie 1 (in deze tekening nog dicht)"],
+};
+
+const WORK = [
+  { group: "Beide opties", rows: [
+    { t: "Vloerisolatie", q: "± 55 m²", o: [1, 2] },
+    { t: "Vloerverwarming", q: "± 55 m²", o: [1, 2] },
+    { t: "Nieuwe vloer leggen", n: "Voorkeur voor parket; alternatief is PVC.", q: "± 55 m²", o: [1, 2] },
+    { t: "Muren stucen", o: [1, 2] },
+    { t: "Toilet verplaatsen", n: "Aansluitingen verleggen, toilet plaatsen en tegelen.", o: [1, 2] },
+    { t: "Muren entree aanpassen", n: "De hal wordt kleiner en het toilet verplaatst.", o: [1, 2] },
+    { t: "Leidingwerk keuken aanpassen", o: [1, 2] },
+    { t: "Nieuwe binnendeur entree plaatsen", o: [1, 2] },
+    { t: "Opening maken in de muur tussen keuken en woonkamer",
+      n: "We vermoeden dat dit een draagmuur is. Hoe groot de opening kan worden, hangt af van wat er mogelijk is.", o: [1, 2] },
+  ]},
+  { group: "Alleen optie 2", rows: [
+    { t: "Bijkeuken verhogen", n: "Het garagedeel is nu 2,15 m hoog.", o: [2] },
+    { t: "Nieuwe pui plaatsen achter", o: [2] },
+    { t: "Vloer egaliseren in het bijkeukendeel van de garage", o: [2] },
+  ]},
+  { group: "Optioneel", optional: true, rows: [
+    { t: "Nieuwe badkamer", n: "Douche, wastafel en tegelwerk; kastjes optioneel." },
+    { t: "Tuindeuren vervangen" },
+  ]},
+];
+
+const fmtM = cm => (cm / 100).toFixed(2).replace(".", ",");
+const byId = id => PLANS.find(p => p.id === id);
+const SHORT = { origineel: "Huidig", optie1: "Optie 1", optie2: "Optie 2" };
+
+/* ---------- 2D ---------- */
+const NS = "http://www.w3.org/2000/svg";
+function el(name, attrs = {}, parent) {
+  const e = document.createElementNS(NS, name);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function bounds() {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const add = p => { x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); };
+  for (const p of PLANS) {
+    p.walls.forEach(w => { add(w.a); add(w.b); });
+    p.dims.forEach(d => { add(d.a); add(d.b); });
+    p.surfaces.forEach(s => s.poly.forEach(add));
+  }
+  return { x0: x0 - 60, y0: y0 - 70, x1: x1 + 60, y1: y1 + 70 };
+}
+function centroid(poly) {
+  let a = 0, cx = 0, cy = 0;
+  for (let i = 0; i < poly.length; i++) {
+    const p = poly[i], q = poly[(i + 1) % poly.length], f = p.x * q.y - q.x * p.y;
+    a += f; cx += (p.x + q.x) * f; cy += (p.y + q.y) * f;
+  }
+  a /= 2;
+  const c = { x: cx / (6 * a), y: cy / (6 * a) };
+  if (inPoly(c, poly)) return c;
+  const xs = poly.map(p => p.x), ys = poly.map(p => p.y);
+  return { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 };
+}
+function inPoly(pt, poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const a = poly[i], b = poly[j];
+    if ((a.y > pt.y) !== (b.y > pt.y) && pt.x < (b.x - a.x) * (pt.y - a.y) / (b.y - a.y) + a.x) inside = !inside;
+  }
+  return inside;
+}
+
+function drawPlan(plan, box) {
+  const svg = el("svg", { viewBox: `${box.x0} ${box.y0} ${box.x1 - box.x0} ${box.y1 - box.y0}`, role: "img", "aria-label": plan.title });
+  const ink = "var(--ink)", muted = "var(--sheet-muted)", bg = "var(--surface)";
+
+  const midX = (box.x0 + box.x1) / 2;
+  el("text", { x: midX, y: box.y0 + 30, "text-anchor": "middle", "font-size": 22, fill: muted, "font-family": "var(--font-body)", "letter-spacing": 3 }, svg).textContent = "TUIN";
+  el("text", { x: midX, y: box.y1 - 12, "text-anchor": "middle", "font-size": 22, fill: muted, "font-family": "var(--font-body)", "letter-spacing": 3 }, svg).textContent = "STRAAT";
+
+  const g = el("g", {}, svg);
+  plan.areas.forEach(a => el("polygon", { points: a.poly.map(p => `${p.x},${p.y}`).join(" "), fill: a.color, stroke: "none" }, g));
+  plan.surfaces.forEach(s => el("polygon", { points: s.poly.map(p => `${p.x},${p.y}`).join(" "), fill: "none", stroke: muted, "stroke-width": 2, "stroke-dasharray": "8 6" }, g));
+
+  const fg = el("g", { fill: "none", stroke: muted, "stroke-width": 1.5, opacity: 0.7 }, g);
+  plan.items.forEach(i => {
+    if (i.zh > 250) return;
+    el("rect", { x: i.x - i.w / 2, y: i.y - i.d / 2, width: i.w, height: i.d, rx: 3, transform: `rotate(${i.rot} ${i.x} ${i.y})` }, fg);
+  });
+
+  // Muren: eerst laag, dan hoog
+  const walls = [...plan.walls].sort((a, b) => (a.h >= 200) - (b.h >= 200));
+  const wg = el("g", {}, g);
+  walls.forEach(w => {
+    const low = w.h < 200;
+    const line = el("line", { x1: w.a.x, y1: w.a.y, x2: w.b.x, y2: w.b.y, stroke: low ? muted : ink, "stroke-width": low ? Math.max(6, w.t * 0.6) : w.t, "stroke-linecap": "square" }, wg);
+    if (low) line.setAttribute("stroke-dasharray", "10 6");
+    const dx = w.b.x - w.a.x, dy = w.b.y - w.a.y, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+    w.openings.forEach(o => {
+      if (o.type === "window" && o.z > 150) return; // bovenlicht
+      const c = o.t * L, s = c - o.w / 2, e = c + o.w / 2;
+      const p1 = { x: w.a.x + ux * s, y: w.a.y + uy * s }, p2 = { x: w.a.x + ux * e, y: w.a.y + uy * e };
+      const nx = -uy * w.t / 2, ny = ux * w.t / 2;
+      el("line", { x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, stroke: bg, "stroke-width": w.t + 1, "stroke-linecap": "butt" }, wg);
+      if (o.type === "window") el("line", { x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, stroke: ink, "stroke-width": 2 }, wg);
+      [p1, p2].forEach(p => el("line", { x1: p.x - nx, y1: p.y - ny, x2: p.x + nx, y2: p.y + ny, stroke: ink, "stroke-width": o.type === "window" ? 2 : 3 }, wg));
+    });
+  });
+
+  // Ruimtenamen
+  const lg = el("g", { "font-family": "var(--font-body)", "text-anchor": "middle", fill: ink, "font-weight": 600 }, g);
+  plan.areas.forEach(a => {
+    if (!a.name || a.name === "Column" || (a.m2 < 1 && a.name !== "MK")) return;
+    const c = centroid(a.poly);
+    el("text", { x: c.x, y: c.y + 8, "font-size": a.m2 < 2 ? 20 : 30 }, lg).textContent = a.name;
+  });
+
+  // Maatlijnen
+  const dg = el("g", { stroke: muted, "stroke-width": 1.5, fill: muted, "font-family": "var(--font-mono)", "font-size": 18 }, g);
+  plan.dims.forEach(d => {
+    const dx = d.b.x - d.a.x, dy = d.b.y - d.a.y, L = Math.hypot(dx, dy);
+    if (L < 40) return;
+    el("line", { x1: d.a.x, y1: d.a.y, x2: d.b.x, y2: d.b.y }, dg);
+    const nx = -dy / L * 8, ny = dx / L * 8;
+    [d.a, d.b].forEach(p => el("line", { x1: p.x - nx, y1: p.y - ny, x2: p.x + nx, y2: p.y + ny }, dg));
+    const mx = (d.a.x + d.b.x) / 2, my = (d.a.y + d.b.y) / 2;
+    const t = el("text", { x: mx, y: my - 8, "text-anchor": "middle", stroke: "none",
+      transform: Math.abs(dy) > Math.abs(dx) ? `rotate(-90 ${mx} ${my})` : "" }, dg);
+    t.textContent = fmtM(L) + " m";
+  });
+  return svg;
+}
+
+function renderVariants() {
+  const box = bounds();
+  const host = document.getElementById("view-2d");
+  PLANS.forEach(p => {
+    const card = document.createElement("article");
+    card.className = "variant";
+    const h = document.createElement("h3"); h.textContent = p.title;
+    const ul = document.createElement("ul");
+    CHANGES[p.id].forEach(t => { const li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+    card.append(h, drawPlan(p, box), ul);
+    host.appendChild(card);
+  });
+}
+
+/* ---------- 3D ---------- */
+let three = null;
+function init3D() {
+  const host = document.getElementById("viewer");
+  const status = document.getElementById("viewer-status");
+  if (!window.THREE || !THREE.OrbitControls) { status.textContent = "3D-model kon niet laden."; return null; }
+  status.remove();
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setClearColor(0xffffff);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  host.prepend(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 200);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.maxPolarAngle = Math.PI * 0.49;
+  controls.minDistance = 3; controls.maxDistance = 40;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xd5dadc, 0.85));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.5);
+  sun.position.set(-6, 14, -8);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10 });
+  scene.add(sun);
+
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshStandardMaterial({ color: 0xe6e9e3, roughness: 1 }));
+  ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; ground.receiveShadow = true;
+  scene.add(ground);
+
+  const M = {
+    wall: new THREE.MeshStandardMaterial({ color: 0xf4f2ed, roughness: 0.9 }),
+    low: new THREE.MeshStandardMaterial({ color: 0xc9ced1, roughness: 0.9 }),
+    glass: new THREE.MeshStandardMaterial({ color: 0x9cc7d8, transparent: true, opacity: 0.35, roughness: 0.1 }),
+    item: new THREE.MeshStandardMaterial({ color: 0xc4c8c9, roughness: 0.8 }),
+  };
+
+  let group = null, variant = "optie1", fitted = false;
+  const S = 0.01; // cm → m
+
+  function box(len, h, t, mat) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(len, h, t), mat);
+    m.castShadow = true; m.receiveShadow = true;
+    return m;
+  }
+
+  function build() {
+    if (group) { scene.remove(group); group.traverse(o => o.geometry && o.geometry.dispose()); }
+    group = new THREE.Group();
+    const plan = byId(variant);
+
+    // Vloeren
+    [...plan.areas].sort((a, b) => b.m2 - a.m2).forEach((a, i) => {
+      const shape = new THREE.Shape(a.poly.map(p => new THREE.Vector2(p.x * S, -p.y * S)));
+      const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshStandardMaterial({ color: new THREE.Color(a.color), roughness: 0.95 }));
+      mesh.rotation.x = -Math.PI / 2; mesh.position.y = 0.002 * (i + 1); mesh.receiveShadow = true;
+      group.add(mesh);
+    });
+
+    // Muren met openingen
+    plan.walls.forEach(w => {
+      const dx = w.b.x - w.a.x, dy = w.b.y - w.a.y, L = Math.hypot(dx, dy);
+      if (L < 1) return;
+      const ux = dx / L, uy = dy / L, ang = -Math.atan2(dy, dx);
+      const mat = w.h < 200 ? M.low : M.wall;
+      const ops = w.openings.map(o => ({ ...o, s: o.t * L - o.w / 2, e: o.t * L + o.w / 2 })).sort((a, b) => a.s - b.s);
+      const piece = (s, e, y0, y1, m) => {
+        y1 = Math.min(y1, w.h);
+        if (e - s < 0.5 || y1 - y0 < 0.5) return;
+        const mesh = box((e - s) * S, (y1 - y0) * S, w.t * S, m);
+        const c = (s + e) / 2;
+        mesh.position.set((w.a.x + ux * c) * S, ((y0 + y1) / 2) * S, (w.a.y + uy * c) * S);
+        mesh.rotation.y = ang;
+        group.add(mesh);
+      };
+      let cur = -w.t / 2;
+      ops.forEach(o => {
+        piece(cur, o.s, 0, w.h, mat);
+        if (o.z > 0) piece(o.s, o.e, 0, o.z, mat);
+        piece(o.s, o.e, o.z + o.zh, w.h, mat);
+        if (o.type === "window") piece(o.s, o.e, o.z, o.z + o.zh, M.glass);
+        cur = Math.max(cur, o.e);
+      });
+      piece(cur, L + w.t / 2, 0, w.h, mat);
+    });
+
+    // Meubels als blokken
+    plan.items.forEach(i => {
+      if (i.zh > 250) return;
+      const m = box(i.w * S, i.zh * S, i.d * S, M.item);
+      m.position.set(i.x * S, (i.z + i.zh / 2) * S, i.y * S);
+      m.rotation.y = -i.rot * Math.PI / 180;
+      group.add(m);
+    });
+
+    scene.add(group);
+    if (!fitted) {
+      const bb = new THREE.Box3().setFromObject(group), c = bb.getCenter(new THREE.Vector3());
+      controls.target.set(c.x, 0.6, c.z);
+      camera.position.set(c.x + 7, 11, c.z + 13);
+      fitted = true;
+    }
+  }
+
+  function resize() {
+    const w = host.clientWidth, h = host.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(host);
+  resize();
+  (function loop() { controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop); })();
+
+  build();
+  return {
+    setVariant(id) { variant = id; build(); },
+    get variant() { return variant; },
+  };
+}
+
+/* ---------- Bediening ---------- */
+const seg = document.getElementById("variant-seg");
+function variantButtons() {
+  seg.innerHTML = "";
+  PLANS.forEach(p => {
+    const b = document.createElement("button");
+    b.type = "button"; b.id = "variant-" + p.id; b.textContent = SHORT[p.id];
+    b.setAttribute("aria-pressed", String(three && three.variant === p.id));
+    b.addEventListener("click", () => { three.setVariant(p.id); variantButtons(); });
+    seg.appendChild(b);
+  });
+}
+function setMode(m) {
+  document.getElementById("mode-2d").setAttribute("aria-pressed", String(m === "2d"));
+  document.getElementById("mode-3d").setAttribute("aria-pressed", String(m === "3d"));
+  document.getElementById("view-2d").hidden = m !== "2d";
+  document.getElementById("view-3d").hidden = m !== "3d";
+  if (m === "3d" && !three) three = init3D();
+  seg.hidden = m !== "3d" || !three;
+  variantButtons();
+}
+document.getElementById("mode-2d").addEventListener("click", () => setMode("2d"));
+document.getElementById("mode-3d").addEventListener("click", () => setMode("3d"));
+
+/* ---------- Werkzaamheden ---------- */
+function renderWork() {
+  const body = document.getElementById("work-body");
+  const mark = on => on ? '<span class="yes" aria-label="ja">✓</span>' : '<span class="no" aria-label="nee">—</span>';
+  WORK.forEach(g => {
+    const tr = document.createElement("tr"); tr.className = "group";
+    const th = document.createElement("th"); th.colSpan = 4; th.textContent = g.group;
+    tr.appendChild(th); body.appendChild(tr);
+    g.rows.forEach(r => {
+      const row = document.createElement("tr");
+      const o = r.o || [];
+      row.innerHTML = `
+        <td><span class="t"></span><span class="note"></span></td>
+        <td class="num"></td>
+        <td class="check">${g.optional ? "" : mark(o.includes(1))}</td>
+        <td class="check">${g.optional ? "" : mark(o.includes(2))}</td>`;
+      row.querySelector(".t").textContent = r.t;
+      const note = row.querySelector(".note");
+      if (r.n) note.textContent = r.n; else note.remove();
+      row.children[1].textContent = r.q || "";
+      body.appendChild(row);
+    });
+  });
+}
+
+/* ---------- Start ---------- */
+renderVariants();
+renderWork();
+if (location.hash === "#3d") setMode("3d");
+</script>
