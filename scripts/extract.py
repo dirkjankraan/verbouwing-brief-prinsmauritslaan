@@ -83,11 +83,7 @@ def build(fml):
                 "poly": [pt(p, v) for p in poly],
             })
 
-        items = [
-            {**pt(i, v), "z": i.get("z", 0), "w": i["width"], "d": i["height"],
-             "zh": i["z_height"], "rot": i.get("rotation", 0)}
-            for i in design["items"] if inside(i["x"], v)
-        ]
+        # Meubilair (design["items"]) wordt bewust genegeerd
         surfaces = [
             {"name": s.get("name"), "poly": [pt(p, v) for p in s["poly"]]}
             for s in design["surfaces"] if inside(s["poly"][0]["x"], v)
@@ -102,9 +98,8 @@ def build(fml):
             for l in design["labels"] if inside(l["x"], v) and l["text"].startswith("H =")
         ]
         out.append({"id": v["id"], "title": v["title"], "walls": walls, "areas": areas,
-                    "items": items, "surfaces": surfaces, "dims": dims, "labels": labels})
-        print(f"{v['id']:10} muren {len(walls):3}  ruimtes {len(areas):2}  items {len(items):3}  "
-              f"maatlijnen {len(dims):3}")
+                    "surfaces": surfaces, "dims": dims, "labels": labels})
+        print(f"{v['id']:10} muren {len(walls):3}  ruimtes {len(areas):2}  maatlijnen {len(dims):3}")
     return out
 
 
