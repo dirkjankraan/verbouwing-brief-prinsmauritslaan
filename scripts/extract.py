@@ -20,8 +20,8 @@ VARIANTS = [
 
 # Ruimtes die in de export geen (bruikbare) naam hebben. Sleutel: (variant, naam, afgeronde min-x, min-y)
 RENAME = {
-    ("optie1", "Other"): "Hal + toilet",
-    ("optie2", "Other"): "Hal + toilet",
+    ("optie1", "Other"): "Hal",
+    ("optie2", "Other"): "Hal",
     ("optie2", None): "Woonkeuken",
 }
 
@@ -79,12 +79,16 @@ def build(fml):
             # Optie 1: smalle strook tussen bijkeuken en woonkamer is de oude kast
             if v["id"] == "optie1" and name == "Woonkamer" and m2 < 2:
                 name = "Kast"
-            areas.append({
+            area = {
                 "name": name,
                 "color": ar.get("color", "#eeeeee"),
                 "m2": round(m2, 2),
                 "poly": [pt(p, v) for p in poly],
-            })
+            }
+            # Label van de hal in de gang, anders valt het over het toilet
+            if name == "Hal":
+                area["label"] = {"x": 78, "y": 440}
+            areas.append(area)
 
         # Meubilair (design["items"]) wordt bewust genegeerd
         surfaces = [
