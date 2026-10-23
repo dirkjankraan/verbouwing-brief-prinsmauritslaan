@@ -88,7 +88,8 @@ def build(fml):
 
         # Meubilair (design["items"]) wordt bewust genegeerd
         surfaces = [
-            {"name": s.get("name"), "poly": [pt(p, v) for p in s["poly"]]}
+            {"name": s.get("customName") or s.get("name"), "color": s.get("color"),
+             "poly": [pt(p, v) for p in s["poly"]]}
             for s in design["surfaces"] if inside(s["poly"][0]["x"], v)
         ]
         dims = [
