@@ -73,6 +73,9 @@ def build(fml):
             # Optie 2: noordelijk garagedeel wordt de nieuwe bijkeuken
             if v["id"] == "optie2" and name == "Garage" and max(p["y"] for p in poly) - v["dy"] < -100:
                 name = "Bijkeuken (nieuw)"
+            # Origineel: het grote "Column"-vlak naast het toilet is de trap
+            if v["id"] == "origineel" and name == "Column" and m2 > 1.5:
+                name = "Trap"
             # Optie 1: smalle strook tussen bijkeuken en woonkamer is de oude kast
             if v["id"] == "optie1" and name == "Woonkamer" and m2 < 2:
                 name = "Kast"
